@@ -18,36 +18,35 @@
 #include <string>
 #include <vector>
 #include <Windows.h>
-using namespace std;
 
 struct TriCount
 {
-	string trigram;
+	std::string trigram;
 	unsigned int count = 0;
 };
 
 // This function stores the name of a file that is in the same directory as the .cpp file (written by Cyril Harris).
-void Compute_1_Filename(string& filename)
+void Compute_1_Filename(std::string& filename)
 {
 	WIN32_FIND_DATAA findfiledata;
 	HANDLE hfind;
-	string file_extension = "*.txt";
-	string directory_file_ext = file_extension;
+	std::string file_extension = "*.txt";
+	std::string directory_file_ext = file_extension;
 	hfind = FindFirstFileA(directory_file_ext.c_str(), &findfiledata);
 
 	if (hfind != INVALID_HANDLE_VALUE)
 		filename = findfiledata.cFileName;
 	else
 	{
-		cout << "No file was present." << endl;
-		cout << "Wilson Lopez" << endl;
-		cout << "Trigram Counter" << endl;
+		std::cout << "No file was present." << std::endl;
+		std::cout << "Wilson Lopez" << std::endl;
+		std::cout << "Trigram Counter" << std::endl;
 		system("pause");
 		exit(EXIT_FAILURE);
 	}
 }
 
-string VerifyWord(string t)
+std::string VerifyWord(std::string t)
 {
 	for (unsigned int i = 0; i < t.size(); i++)
 	{
@@ -71,10 +70,10 @@ string VerifyWord(string t)
 	return t;
 }
 
-void StoreFileWords(vector<string>& file_words, string foldername_filename)
+void StoreFileWords(std::vector<std::string>& file_words, std::string foldername_filename)
 {
-	ifstream file_input;
-	string temp;
+	std::ifstream file_input;
+	std::string temp;
 	
 	file_input.open(foldername_filename);
 
@@ -82,11 +81,11 @@ void StoreFileWords(vector<string>& file_words, string foldername_filename)
 		file_words.push_back(VerifyWord(temp));
 }
 
-void SearchFileTrigrams(vector<string> words, vector<TriCount>& tri)
+void SearchFileTrigrams(std::vector<std::string> words, std::vector<TriCount>& tri)
 {
 	if (words.size() < 3)
 	{
-		cout << "There are no trigrams.";
+		std::cout << "There are no trigrams.";
 	}
 
 	for (unsigned int i = 0; i < words.size(); i++)
@@ -107,23 +106,23 @@ void SearchFileTrigrams(vector<string> words, vector<TriCount>& tri)
 	}
 }
 
-void CreateCSV(string foldername_filename, vector<TriCount> file_trigrams)
+void CreateCSV(std::string foldername_filename, std::vector<TriCount> file_trigrams)
 {
-	ofstream file_output;
+	std::ofstream file_output;
 	file_output.open("Trigram Counts - " + foldername_filename + " Results.csv");
-	file_output << "Trigram" << ", " << "Counts" << endl;
+	file_output << "Trigram" << ", " << "Counts" << std::endl;
 	for (unsigned int i = 0; i < file_trigrams.size(); i++)
 	{
-		file_output << file_trigrams[i].trigram << ", " << file_trigrams[i].count << endl;
+		file_output << file_trigrams[i].trigram << ", " << file_trigrams[i].count << std::endl;
 	}
 	file_output.close();
 }
 
 int main()
 {
-	string foldername_filename;
-	vector<string> file_words;
-	struct vector<TriCount> file_trigrams;
+	std::string foldername_filename;
+	std::vector<std::string> file_words;
+	struct std::vector<TriCount> file_trigrams;
 
 	Compute_1_Filename(foldername_filename);
 
@@ -133,9 +132,9 @@ int main()
 
 	CreateCSV(foldername_filename, file_trigrams);
 
-	cout << "Wilson Lopez" << endl;
-	cout << "Trigram Counter" << endl;
-	cout << "Counting Trigrams from: " << foldername_filename << endl;
+	std::cout << "Wilson Lopez" << std::endl;
+	std::cout << "Trigram Counter" << std::endl;
+	std::cout << "Counting Trigrams from: " << foldername_filename << std::endl;
 
 	return 0;
 }
