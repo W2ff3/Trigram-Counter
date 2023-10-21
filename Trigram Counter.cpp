@@ -19,13 +19,15 @@
 #include <vector>
 #include <Windows.h>
 
+// Contains a string that contains the trigram (sequence of 3 words),
+// and the number of appearances that, that specific trigram has in the file.
 struct TriCount
 {
 	std::string trigram;
 	unsigned int count = 0;
 };
 
-// This function stores the name of a file that is in the same directory as the .cpp file (written by Cyril Harris).
+// This function stores the name of a .txt file that is in the same directory as the .cpp file (written by Cyril Harris).
 void Compute_1_Filename(std::string& filename)
 {
 	WIN32_FIND_DATAA findfiledata;
@@ -39,13 +41,12 @@ void Compute_1_Filename(std::string& filename)
 	else
 	{
 		std::cout << "No file was present." << std::endl;
-		std::cout << "Wilson Lopez" << std::endl;
-		std::cout << "Trigram Counter" << std::endl;
-		system("pause");
-		exit(EXIT_FAILURE);
+		exit(0);
 	}
 }
 
+
+// Verifies that the parameter is a word, and modifies the string's characters according to its attributes.
 std::string VerifyWord(std::string t)
 {
 	for (unsigned int i = 0; i < t.size(); i++)
@@ -70,7 +71,8 @@ std::string VerifyWord(std::string t)
 	return t;
 }
 
-void StoreFileWords(std::vector<std::string>& file_words, std::string foldername_filename)
+// Populates file_words vector with verified words from .txt file input.
+void StoreFileWords(std::vector<std::string>& file_words, const std::string& foldername_filename)
 {
 	std::ifstream file_input;
 	std::string temp;
@@ -81,22 +83,28 @@ void StoreFileWords(std::vector<std::string>& file_words, std::string foldername
 		file_words.push_back(VerifyWord(temp));
 }
 
-void SearchFileTrigrams(std::vector<std::string> words, std::vector<TriCount>& tri)
+// Searches for trigrams inside file_words vector and pushes trigrams into the vector of TriCounts.
+void SearchFileTrigrams(const std::vector<std::string>& words, std::vector<TriCount>& tri)
 {
-	if (words.size() < 3)
-	{
+	if (words.size() < 3) 
 		std::cout << "There are no trigrams.";
-	}
 
 	for (unsigned int i = 0; i < words.size(); i++)
 	{
+		// Break loop if at the last trigram.
 		if ((i + 1 == words.size() - 1) and (i + 2 == words.size()))
 			break;
+
+		// Push back new found trigrams (with a starting count of 1) to file_trigrams vector.
 		tri.push_back({ words[i] + " " + words[i + 1] + " " + words[i + 2], 1 });
+
+		// Look for more instances of already found trigrams, and increment their respective count variables.
 		for (unsigned int j = i + 1; j < words.size(); j++)
 		{
+			// Break if at the last trigram.
 			if ((j + 1 == words.size() - 1) and (j + 2 == words.size()))
 				break;
+			// Increment count is another instance of ith trigram is found at another location.
 			if (tri[i].trigram == words[j] + " " + words[j + 1] + " " + words[j + 2])
 			{
 				tri[i].count++;
@@ -106,15 +114,19 @@ void SearchFileTrigrams(std::vector<std::string> words, std::vector<TriCount>& t
 	}
 }
 
-void CreateCSV(std::string foldername_filename, std::vector<TriCount> file_trigrams)
+// Formats and outputs a .csv files with trigrams results.
+void CreateCSV(const std::string foldername_filename, const std::vector<TriCount>& file_trigrams)
 {
 	std::ofstream file_output;
+
 	file_output.open("Trigram Counts - " + foldername_filename + " Results.csv");
 	file_output << "Trigram" << ", " << "Counts" << std::endl;
+
 	for (unsigned int i = 0; i < file_trigrams.size(); i++)
 	{
 		file_output << file_trigrams[i].trigram << ", " << file_trigrams[i].count << std::endl;
 	}
+
 	file_output.close();
 }
 
@@ -132,8 +144,6 @@ int main()
 
 	CreateCSV(foldername_filename, file_trigrams);
 
-	std::cout << "Wilson Lopez" << std::endl;
-	std::cout << "Trigram Counter" << std::endl;
 	std::cout << "Counting Trigrams from: " << foldername_filename << std::endl;
 
 	return 0;
