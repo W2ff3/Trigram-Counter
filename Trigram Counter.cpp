@@ -106,10 +106,7 @@ void SearchFileTrigrams(const std::vector<std::string>& words, std::vector<TriCo
 				break;
 			// Increment count is another instance of ith trigram is found at another location.
 			if (tri[i].trigram == words[j] + " " + words[j + 1] + " " + words[j + 2])
-			{
 				tri[i].count++;
-
-			}
 		}
 	}
 }
