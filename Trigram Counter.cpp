@@ -86,23 +86,25 @@ void StoreFileWords(std::vector<std::string>& file_words, const std::string& fol
 // Searches for trigrams inside file_words vector and pushes trigrams into the vector of TriCounts.
 void SearchFileTrigrams(const std::vector<std::string>& words, std::vector<TriCount>& tri)
 {
-	if (words.size() < 3) 
+	const unsigned int w_num = words.size();
+
+	if (w_num < 3) 
 		std::cout << "There are no trigrams.";
 
-	for (unsigned int i = 0; i < words.size(); i++)
+	for (unsigned int i = 0; i < w_num; i++)
 	{
 		// Break loop if at the last trigram.
-		if ((i + 1 == words.size() - 1) and (i + 2 == words.size()))
+		if ((i + 1 == w_num - 1) and (i + 2 == w_num))
 			break;
 
 		// Push back new found trigrams (with a starting count of 1) to file_trigrams vector.
 		tri.push_back({ words[i] + " " + words[i + 1] + " " + words[i + 2], 1 });
 
 		// Look for more instances of already found trigrams, and increment their respective count variables.
-		for (unsigned int j = i + 1; j < words.size(); j++)
+		for (unsigned int j = i + 1; j < w_num; j++)
 		{
 			// Break if at the last trigram.
-			if ((j + 1 == words.size() - 1) and (j + 2 == words.size()))
+			if ((j + 1 == w_num - 1) and (j + 2 == w_num))
 				break;
 			// Increment count is another instance of ith trigram is found at another location.
 			if (tri[i].trigram == words[j] + " " + words[j + 1] + " " + words[j + 2])
