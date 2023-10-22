@@ -87,28 +87,45 @@ void StoreFileWords(std::vector<std::string>& file_words, const std::string& fol
 void SearchFileTrigrams(const std::vector<std::string>& words, std::vector<TriCount>& tri)
 {
 	const unsigned int w_num = words.size();
+	std::string tri_temp; // Stores trigram that is analyzed inside for-loops.
 
 	if (w_num < 3) 
 		std::cout << "There are no trigrams.";
-
-	for (unsigned int i = 0; i < w_num; i++)
+	else
 	{
-		// Break loop if at the last trigram.
-		if ((i + 1 == w_num - 1) and (i + 2 == w_num))
-			break;
-
-		// Push back new found trigrams (with a starting count of 1) to file_trigrams vector.
-		tri.push_back({ words[i] + " " + words[i + 1] + " " + words[i + 2], 1 });
-
-		// Look for more instances of already found trigrams, and increment their respective count variables.
-		for (unsigned int j = i + 1; j < w_num; j++)
+		for (unsigned int i = 0; i < w_num; i++)
 		{
-			// Break if at the last trigram.
-			if ((j + 1 == w_num - 1) and (j + 2 == w_num))
+			// Break loop if at the last trigram.
+			if ((i + 1 == w_num - 2) and (i + 2 == w_num - 1))
 				break;
-			// Increment count is another instance of ith trigram is found at another location.
-			if (tri[i].trigram == words[j] + " " + words[j + 1] + " " + words[j + 2])
-				tri[i].count++;
+			else
+			{
+				tri_temp = words[i] + ' ' + words[i + 1] + ' ' + words[i + 2];
+
+				// Push back new found trigrams (with a starting count of 1) to file_trigrams vector.
+				tri.push_back({ tri_temp, 1 });
+
+				auto pred = [tri_temp](const TriCount& item) {
+					return item.trigram == tri_temp;
+					};
+
+				if (std::find_if(std::begin(tri), std::end(tri), pred) != std::end(tri))
+				{
+					tri.erase(tri.begin() + 1);
+					continue;
+				}
+
+				// Look for more instances of already found trigrams, and increment their respective count variables.
+				for (unsigned int j = i + 1; j < w_num; j++)
+				{
+					// Increment count if another instance of ith trigram is found at another location.
+					if (tri[i].trigram == words[j] + " " + words[j + 1] + " " + words[j + 2])
+						tri[i].count++;
+					// Break if at the last trigram.
+					if ((j + 1 == w_num - 2) and (j + 2 == w_num - 1))
+						break;
+				}
+			}
 		}
 	}
 }
@@ -133,7 +150,7 @@ int main()
 {
 	std::string foldername_filename;
 	std::vector<std::string> file_words;
-	struct std::vector<TriCount> file_trigrams;
+	std::vector<TriCount> file_trigrams;
 
 	Compute_1_Filename(foldername_filename);
 
