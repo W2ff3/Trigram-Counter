@@ -17,7 +17,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <set>
 #include <Windows.h>
 
 // Contains a string that contains the trigram (sequence of 3 words),
@@ -60,7 +59,7 @@ std::string VerifyWord(std::string t)
 		// If the character in the word is lowercase or a number from 0 to 9:
 		else if ((t[i] >= 'a' and t[i] <= 'z') or (t[i] >= '0' and t[i] <= '9'))
 		{
-			t[i];	// Do nothing.
+			;	// Do nothing.
 		}
 		// Else, if it is not a valid letter or number:
 		else
@@ -84,6 +83,25 @@ void StoreFileWords(std::vector<std::string>& file_words, const std::string& fol
 		file_words.push_back(VerifyWord(temp));
 }
 
+// Determines whether tri_temp is inside the tri vector.
+void TrigramDuplicate(const std::string& tri_temp, std::vector<TriCount>& tri, bool& dup)
+{
+	if (!tri.empty())
+	{
+		dup = false;
+		for (std::vector<TriCount>::reverse_iterator t = tri.rbegin(); t != tri.rend(); ++t)
+		{
+			if (tri_temp == t->trigram)
+			{
+				dup = true;
+				break;
+			}
+			else
+				dup = false;
+		}
+	}
+}
+
 // Searches for trigrams inside file_words vector and pushes trigrams into the vector of TriCounts.
 void SearchFileTrigrams(const std::vector<std::string>& words, std::vector<TriCount>& tri)
 {
@@ -97,57 +115,40 @@ void SearchFileTrigrams(const std::vector<std::string>& words, std::vector<TriCo
 	{
 		for (unsigned int i = 0; i < w_num; i++)
 		{
-			// Break outer loop if at the last trigram.
-			if ((i + 1 == w_num - 2) and (i + 2 == w_num - 1))
-				break;
-			else
+			tri_temp = words[i] + ' ' + words[i + 1] + ' ' + words[i + 2];
+			
+			TrigramDuplicate(tri_temp, tri, dup);
+			
+			if (!dup)
 			{
-				tri_temp = words[i] + ' ' + words[i + 1] + ' ' + words[i + 2];
-
-				// If tri_temp is already inside the tri vector, set dup to true.
-				if (!tri.empty())
-				{
-					dup = false;
-					for (std::vector<TriCount>::reverse_iterator t = tri.rbegin(); t != tri.rend(); ++t)
-					{
-						if (tri_temp == t->trigram)
-						{
-							dup = true;
-							break;
-						}
-					}
-				}
-
-				// When dup is true, skip the remainder of outer loop statements to avoid pushing back a duplicate trigram with an incorrect count.
-				if (dup)
-					continue;
-
 				// Push back new found trigrams (with a starting count of 1) to file_trigrams vector.
 				tri.push_back({ tri_temp, 1 });
 
-				//auto pred = [tri_temp](const TriCount& item) {
-				//	return item.trigram == tri_temp;
-				//	};
-				//if (std::find_if(std::begin(tri), std::end(tri), pred) != std::end(tri))
-				//{
-				//	tri.erase(tri.begin() + i);
-				//	continue;
-				//}
-
-				// Look for more instances of already found trigrams, and increment their respective count variables.
-				for (unsigned int j = i + 1; j < w_num; j++)
+				if ((i + 1 == w_num - 2) and (i + 2 == w_num - 1))
+					break;
+				else
 				{
-					tri_temp = words[j] + ' ' + words[j + 1] + ' ' + words[j + 2];
+					// Look for more instances of already found trigrams, and increment their respective count variables.
+					for (unsigned int j = i + 1; j < w_num; j++)
+					{
+						tri_temp = words[j] + ' ' + words[j + 1] + ' ' + words[j + 2];
 
-					// Increment count if another instance of ith trigram is found at another location.
-					if (tri[i].trigram == tri_temp)
-						tri[i].count++;
+						// Increment count if another instance of the latest trigram addition is found inside the file's words.
+						if (tri.back().trigram == tri_temp)
+							tri.back().count++;
 
-					// Break inner loop if at the last trigram.
-					if ((j + 1 == w_num - 2) and (j + 2 == w_num - 1))
-						break;
+						// Break inner loop if at the last trigram.
+						if ((j + 1 == w_num - 2) and (j + 2 == w_num - 1))
+							break;
+					}
 				}
 			}
+			// Break outer loop if at the last trigram.
+			else if ((i + 1 == w_num - 2) and (i + 2 == w_num - 1))
+				break;
+			// If tri_temp was found inside the tri vector, continue to next iteration.
+			else
+				continue;
 		}
 	}
 }

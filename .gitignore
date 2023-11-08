@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Trigram Counts - Demo.txt Results.csv
+/Demo2.txt
